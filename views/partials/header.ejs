@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="dns-prefetch" href="//www.google-analytics.com">
+
+    <% 
+       const safeSiteName = typeof siteName !== 'undefined' ? siteName : 'AnimeNews'; 
+       const safeSiteUrl = typeof siteUrl !== 'undefined' ? siteUrl : ''; 
+       const safeSeoData = typeof seoData !== 'undefined' ? seoData : {}; 
+    %>
+
+    <meta name="google-site-verification" content="" />
+
+    <title><%= safeSeoData.seo_title || safeSiteName %></title>
+    <meta name="description" content="<%= safeSeoData.seo_description || 'Portal Berita Anime, Manga, dan Game Terlengkap.' %>">
+    <meta name="robots" content="<%= typeof safeSeoData !== 'undefined' && safeSeoData.robots ? safeSeoData.robots : 'index, follow, max-snippet:-1, max-video-preview:-1, max-image-preview:large' %>">
+
+    <link rel="canonical" href="<%= safeSeoData.current_url || safeSiteUrl %>">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="alternate" type="application/rss+xml" title="<%= safeSiteName %> - Berita Terbaru" href="/rss">
+    <link rel="sitemap" type="application/xml" title="Sitemap Utama" href="/sitemap.xml">
+    <link rel="sitemap" type="application/xml" title="Sitemap Berita (Google News)" href="/sitemap-news.xml">
+
+    <% if (typeof categoryName !== 'undefined' && categoryName) { %>
+    <link rel="alternate" type="application/rss+xml" title="<%= safeSiteName %> - Kategori <%= categoryName %>" href="/rss/category/<%= typeof currentSlug !== 'undefined' ? currentSlug : '' %>">
+    <% } %>
+    <meta property="og:type" content="<%= safeSeoData.og_type || 'website' %>">
+    <meta property="og:url" content="<%= safeSeoData.current_url || safeSiteUrl %>">
+    <meta property="og:title" content="<%= safeSeoData.seo_title || safeSiteName %>">
+    <meta property="og:description" content="<%= safeSeoData.seo_description || '' %>">
+    <meta property="og:site_name" content="<%= safeSiteName %>">
+    <meta property="og:image" content="<%= safeSeoData.og_image || safeSiteUrl + '/img/default-cover.jpg' %>">
+    <meta property="og:image:secure_url" content="<%= safeSeoData.og_image || safeSiteUrl + '/img/default-cover.jpg' %>">
+    <meta property="og:image:width" content="854">
+    <meta property="og:image:height" content="480">
+    <meta property="og:image:alt" content="<%= safeSeoData.seo_title || safeSiteName %>">
+
+    <% if (safeSeoData.og_date) { %>
+    <meta property="article:published_time" content="<%= safeSeoData.og_date %>">
+    <% } %>
+
+    <meta name="twitter:card" content="<%= safeSeoData.twitter_card || 'summary_large_image' %>">
+    <meta name="twitter:title" content="<%= safeSeoData.seo_title || safeSiteName %>">
+    <meta name="twitter:description" content="<%= safeSeoData.seo_description || '' %>">
+    <meta name="twitter:site" content="<%= safeSeoData.twitter_site || `@${safeSiteName}` %>">
+    <meta name="twitter:image" content="<%= safeSeoData.twitter_image || '' %>">
+
+    <% if (safeSeoData.og_type === 'article') { %>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "WebSite",
+                "@id": "<%= safeSiteUrl %>/#website",
+                "url": "<%= safeSiteUrl %>",
+                "name": "<%= safeSiteName %>",
+                "publisher": { "@id": "<%= safeSiteUrl %>/#organization" },
+                "inLanguage": "id"
+            },
+            {
+                "@type": "Organization",
+                "@id": "<%= safeSiteUrl %>/#organization",
+                "name": "<%= safeSiteName %>",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "<%= safeSiteUrl %>/img/logo.png"
+                }
+            },
+            {
+                "@type": "NewsArticle",
+                "headline": "<%= safeSeoData.seo_title %>",
+                "datePublished": "<%= safeSeoData.schema_date %>",
+                "dateModified": "<%= safeSeoData.schema_date %>",
+                "author": {
+                    "@type": "Person",
+                    "name": "<%= safeSeoData.schema_author_name || 'Redaksi' %>"
+                },
+                "publisher": { "@id": "<%= safeSiteUrl %>/#organization" },
+                "description": "<%= safeSeoData.seo_description %>",
+                "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": "<%= safeSeoData.current_url %>"
+                },
+                "image": {
+                    "@type": "ImageObject",
+                    "url": "<%= safeSeoData.og_image %>",
+                    "width": 854,
+                    "height": 480
+                },
+                "articleSection": [
+                    <% if(safeSeoData.schema_sections) { %>
+                        <% safeSeoData.schema_sections.forEach((sec, index) => { %>
+                            "<%= sec %>"<%= index < safeSeoData.schema_sections.length - 1 ? ',' : '' %>
+                        <% }) %>
+                    <% } else { %>
+                        "Anime", "Berita"
+                    <% } %>
+                ]
+            }
+        ]
+    }
+    </script>
+    <% } else { %>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "<%= safeSiteName %>",
+        "url": "<%= safeSiteUrl %>",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "<%= safeSiteUrl %>/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    <% } %>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #db2777; }
+
+        .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .article-content p { margin-bottom: 1rem; }
+        .article-content img { border-radius: 0.5rem; margin: 1rem 0; width: 100%; height: auto; }
+        .article-content iframe { width: 100%; aspect-ratio: 16/9; border-radius: 0.5rem; }
+
+        /* Animasi Menu */
+        @keyframes slideDown { 
+            from { opacity: 0; transform: translateY(-10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        .animate-slideDown { animation: slideDown 0.3s ease-out; }
+    </style>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-29T201X0MN"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-29T201X0MN');
+    </script>
+</head>
+
+<body class="bg-gray-900 text-gray-200 font-sans min-h-screen flex flex-col selection:bg-pink-500 selection:text-white">
+
+    <header>
+        <nav class="bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 shadow-lg sticky top-0 z-50">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+
+                <div class="flex items-center gap-4">
+                    <a href="/" class="flex items-center gap-2 group">
+                        <div class="w-8 h-8 rounded bg-pink-600 flex items-center justify-center text-white font-bold transform group-hover:rotate-12 transition">U</div>
+                        <span class="text-xl font-bold text-white tracking-tight">
+                            Ulasan<span class="text-pink-500">ime</span>
+                        </span>
+                    </a>
+
+                    <div class="hidden md:flex items-center gap-4 ml-6">
+                        <a href="/" class="text-gray-300 hover:text-pink-500 transition font-medium px-3 py-1 rounded-lg hover:bg-gray-800">Beranda</a>
+                        <a href="/category/anime" class="text-gray-300 hover:text-pink-500 transition font-medium px-3 py-1 rounded-lg hover:bg-gray-800">Anime</a>
+                        <a href="/category/manga" class="text-gray-300 hover:text-pink-500 transition font-medium px-3 py-1 rounded-lg hover:bg-gray-800">Manga</a>
+                        <a href="/category/game" class="text-gray-300 hover:text-pink-500 transition font-medium px-3 py-1 rounded-lg hover:bg-gray-800">Game</a>
+                        <a href="/category/jadwal" class="text-gray-300 hover:text-pink-500 transition font-medium px-3 py-1 rounded-lg hover:bg-gray-800">Jadwal</a>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex flex-grow max-w-lg mx-6">
+                    <form action="/search" method="GET" class="flex w-full">
+                        <div class="relative w-full">
+                            <input type="text" name="q" placeholder="Cari berita..." value="<%= typeof query !== 'undefined' ? query : '' %>"
+                                class="w-full bg-gray-800 text-gray-200 text-sm rounded-l-lg pl-4 pr-4 py-2.5 border border-gray-700 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all placeholder-gray-500">
+                        </div>
+                        <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white px-5 py-2.5 rounded-r-lg text-sm font-medium transition-colors flex items-center gap-2">
+                            <span>Cari</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="flex items-center gap-3 md:hidden">
+                    <button id="mobile-search-toggle" aria-label="Search" class="p-2 rounded-lg text-gray-300 hover:bg-gray-800 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                    <button id="mobile-menu-toggle" aria-label="Open Menu" class="p-2 rounded-lg text-gray-300 hover:bg-gray-800 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
+                <div class="hidden md:flex items-center gap-3">
+                    <a href="/admin" class="text-sm font-bold text-pink-500 hover:text-white transition">Dashboard</a>
+                    <a href="/admin/logout" class="text-sm text-gray-400 hover:text-white transition">Logout</a>
+                </div>
+                <% } %>
+            </div>
+
+            <div id="mobile-search-form" class="hidden md:hidden container mx-auto px-4 pb-3">
+                <form action="/search" method="GET" class="flex w-full">
+                    <div class="relative w-full">
+                        <input type="text" name="q" placeholder="Cari berita..." value="<%= typeof query !== 'undefined' ? query : '' %>"
+                            class="w-full bg-gray-800 text-gray-200 text-sm rounded-l-lg pl-4 pr-4 py-2.5 border border-gray-700 focus:outline-none focus:border-pink-500 transition-all">
+                    </div>
+                    <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2.5 rounded-r-lg text-sm font-medium">Cari</button>
+                </form>
+            </div>
+        </nav>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-800 border-b border-gray-700 shadow-lg">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex flex-col space-y-3">
+                    <a href="/" class="text-gray-300 hover:text-pink-500 px-3 py-2 rounded-lg hover:bg-gray-700 flex items-center gap-2">Beranda</a>
+                    <a href="/category/anime" class="text-gray-300 hover:text-pink-500 px-3 py-2 rounded-lg hover:bg-gray-700 flex items-center gap-2">Anime</a>
+                    <a href="/category/manga" class="text-gray-300 hover:text-pink-500 px-3 py-2 rounded-lg hover:bg-gray-700 flex items-center gap-2">Manga</a>
+                    <a href="/category/game" class="text-gray-300 hover:text-pink-500 px-3 py-2 rounded-lg hover:bg-gray-700 flex items-center gap-2">Game</a>
+                     <a href="/category/jadwal" class="text-gray-300 hover:text-pink-500 px-3 py-2 rounded-lg hover:bg-gray-700 flex items-center gap-2">Jadwal</a>
+
+                    <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
+                    <div class="pt-4 border-t border-gray-700">
+                        <a href="/admin" class="text-pink-500 font-bold px-3 py-2 rounded-lg hover:bg-gray-700 flex items-center gap-2">Dashboard Admin</a>
+                        <a href="/admin/post" class="text-gray-300 px-3 py-2 rounded-lg hover:bg-gray-700 flex items-center gap-2">+ Posting Berita</a>
+                        <a href="/admin/logout" class="text-gray-400 px-3 py-2 rounded-lg hover:bg-gray-700 flex items-center gap-2">Logout</a>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full min-w-0">
+
+    <script>
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileSearchToggle = document.getElementById('mobile-search-toggle');
+        const mobileSearchForm = document.getElementById('mobile-search-form');
+
+        mobileMenuToggle.addEventListener('click', function () {
+            mobileMenu.classList.toggle('hidden');
+            if (!mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('animate-slideDown');
+                mobileSearchForm.classList.add('hidden');
+            }
+        });
+
+        mobileSearchToggle.addEventListener('click', function () {
+            mobileSearchForm.classList.toggle('hidden');
+            if (!mobileSearchForm.classList.contains('hidden')) {
+                mobileSearchForm.classList.add('animate-slideDown');
+                mobileMenu.classList.add('hidden');
+                const searchInput = mobileSearchForm.querySelector('input[name="q"]');
+                if (searchInput) searchInput.focus();
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!mobileMenu.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    </script>

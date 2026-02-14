@@ -1,0 +1,116 @@
+<%- include('../partials/header') %>
+
+<link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+<style>
+    /* Override Tagify untuk Dark Mode */
+    .tagify { --tags-border-color: #374151; --tags-focus-border-color: #eab308; --tag-bg: #1f2937; --tag-text-color: #fff; background-color: #1f2937; color: white; border-radius: 0.5rem; }
+    .tagify__input { color: white; }
+    .tagify__dropdown { background: #1f2937; color: white; border-color: #374151; }
+    .tagify__dropdown__item:hover { background: #374151; color: #eab308; }
+</style>
+
+<script src="https://cdn.tiny.cloud/1/aem9p7at0sj3ygzyl8vzre280voqzloawtw2jrhlxoelerkf/tinymce/8/tinymce.min.js" referrerpolicy="origin" crossorigin="anonymous"></script>
+
+<div class="container mx-auto px-4 py-8 mb-10">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-gray-800 rounded-xl shadow-xl border border-gray-700 overflow-hidden">
+            <div class="bg-yellow-600/20 px-6 py-4 border-b border-yellow-600/30 flex justify-between items-center">
+                <h5 class="text-xl font-bold text-yellow-500">Edit Berita</h5>
+            </div>
+            
+            <div class="p-6">
+                <form action="/admin/edit/<%= post._id %>" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    <input type="hidden" name="oldImage" value="<%= post.image %>">
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="md:col-span-3">
+                            <label class="block text-gray-400 font-bold mb-2">Judul Berita</label>
+                            <input type="text" name="title" value="<%= post.title %>" class="w-full bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-500 transition" required>
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-gray-400 font-bold mb-2">Status</label>
+                            <select name="status" class="w-full bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-500 transition">
+                                <option value="published" <%= post.status === 'published' ? 'selected' : '' %>>✅ Publish</option>
+                                <option value="draft" <%= post.status === 'draft' ? 'selected' : '' %>>📝 Draft</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2">Custom URL (Slug)</label>
+                        <div class="flex">
+                            <span class="inline-flex items-center px-3 text-sm text-gray-400 bg-gray-900 border border-r-0 border-gray-600 rounded-l-md">
+                                /read/
+                            </span>
+                            <input type="text" name="slug" value="<%= post.slug %>" class="w-full bg-gray-700 text-white border border-gray-600 rounded-r-lg px-4 py-3 focus:outline-none focus:border-yellow-500 transition" placeholder="judul-berita-anda-disini">
+                        </div>
+                        <small class="text-gray-500">Hati-hati mengubah slug, link lama yang sudah dibagikan mungkin akan rusak (404).</small>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2">
+                            Meta Description (SEO)
+                            <span class="text-xs font-normal text-gray-500 ml-2">(Opsional)</span>
+                        </label>
+                        <textarea name="seoDescription" rows="2" class="w-full bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-500 transition text-sm" placeholder="Ringkasan untuk Google..."><%= post.seoDescription || '' %></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-400 font-bold mb-2">Kategori</label>
+                            <input name="category" class="w-full bg-gray-700 text-white rounded-lg" value="<%= post.category.join(',') %>">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 font-bold mb-2">Tags</label>
+                            <input name="tags" class="w-full bg-gray-700 text-white rounded-lg" value="<%= post.tags.join(',') %>">
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
+                        <label class="block text-gray-400 font-bold mb-2">Gambar Utama</label>
+                        <div class="flex items-center gap-4 mb-4">
+                            <img src="<%= post.image.startsWith('http') ? post.image : '/uploads/' + post.image %>" class="w-24 h-16 object-cover rounded border border-gray-600">
+                            <span class="text-xs text-gray-500">Gambar saat ini. Upload baru jika ingin mengganti.</span>
+                        </div>
+                        <input type="file" name="image" class="w-full bg-gray-700 text-gray-300 border border-gray-600 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-l-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-600 file:text-white hover:file:bg-gray-500 cursor-pointer">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2">Isi Berita</label>
+                        <textarea id="editor-content" name="content" class="w-full"><%- post.content %></textarea>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <a href="/admin" class="w-1/3 text-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition">Batal</a>
+                        <button type="submit" class="w-2/3 bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-lg shadow-lg transition transform hover:-translate-y-1">
+                            Update Berita
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+<script>
+  // TinyMCE
+  tinymce.init({
+    selector: '#editor-content',
+    skin: 'oxide-dark', content_css: 'dark',
+    plugins: ['code', 'link', 'image', 'lists', 'media', 'table', 'wordcount', 'mediaembed'],
+    toolbar: 'code | undo redo | bold italic | link media | numlist bullist',
+    height: 400
+  });
+
+  // Tagify
+  var inputCategory = document.querySelector('input[name=category]');
+  new Tagify(inputCategory, {
+      whitelist: ["Anime", "Manga", "Game", "Jadwal"],
+      dropdown: { maxItems: 20, classname: "tags-look", enabled: 0, closeOnSelect: false }
+  });
+  var inputTags = document.querySelector('input[name=tags]');
+  new Tagify(inputTags);
+</script>
+
+<%- include('../partials/footer') %>

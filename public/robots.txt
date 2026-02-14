@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /search
+Allow: /
+Allow: /uploads/
+
+# Peta Situs Utama
+Sitemap: https://www.ulasanime.fun/sitemap.xml
+
+# Peta Situs Berita (Google News)
+Sitemap: https://www.ulasanime.fun/sitemap-news.xml

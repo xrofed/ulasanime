@@ -1,0 +1,288 @@
+<%- include('partials/header') %>
+
+    <div class="container mx-auto px-3 py-6 max-w-6xl">
+        <% if (headline) { %>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <div class="lg:col-span-2">
+
+                    <div class="grid grid-cols-2 gap-1 mb-8">
+                        <div class="col-span-2 relative h-64 md:h-96 rounded-lg overflow-hidden group">
+                            <a href="/read/<%= headline.slug %>" class="block w-full h-full">
+                                <img src="<%= headline.image.startsWith('http') ? headline.image : '/uploads/' + headline.image %>"
+                                    class="w-full h-full object-cover transition duration-500 group-hover:scale-105"
+                                    alt="<%= headline.title %>">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent">
+                                </div>
+                                <div class="absolute bottom-0 left-0 p-4 md:p-6 w-full">
+                                    <span
+                                        class="bg-pink-600 text-white text-xs font-bold px-3 py-1 rounded uppercase mb-2 inline-block shadow-sm">
+                                        <%= headline.category[0] %>
+                                    </span>
+                                    <h2
+                                        class="text-white font-bold text-xl md:text-3xl leading-tight line-clamp-2 drop-shadow-md">
+                                        <%= headline.title %>
+                                    </h2>
+                                </div>
+                            </a>
+                        </div>
+
+                        <% const subHeadlines=listPosts.slice(0, 2); %>
+                            <% const remainingPosts=listPosts.slice(2); %>
+
+                                <% subHeadlines.forEach(post=> { %>
+                                    <div class="col-span-1 relative h-32 md:h-48 rounded-lg overflow-hidden group">
+                                        <a href="/read/<%= post.slug %>" class="block w-full h-full">
+                                            <img src="<%= post.image.startsWith('http') ? post.image : '/uploads/' + post.image %>"
+                                                class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
+                                            <div
+                                                class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent">
+                                            </div>
+                                            <div class="absolute bottom-0 left-0 p-3 w-full">
+                                                <h3
+                                                    class="text-white font-bold text-xs md:text-sm leading-tight line-clamp-2 drop-shadow-sm">
+                                                    <%= post.title %>
+                                                </h3>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <% }) %>
+                    </div>
+
+                    <div class="mb-6 flex items-center justify-between border-b border-gray-700 pb-2">
+                        <h3 class="text-xl font-bold text-white border-l-4 border-pink-500 pl-3">Terbaru</h3>
+                    </div>
+
+                    <div id="post-container" class="flex flex-col gap-6">
+                        <% remainingPosts.forEach(post=> { %>
+                            <article class="flex gap-4 border-b border-gray-800 pb-6 last:border-0 group">
+                                <div
+                                    class="w-[120px] h-[85px] md:w-[180px] md:h-[120px] flex-shrink-0 overflow-hidden rounded-md bg-gray-800">
+                                    <a href="/read/<%= post.slug %>" class="block w-full h-full">
+                                        <img src="<%= post.image.startsWith('http') ? post.image : '/uploads/' + post.image %>"
+                                            class="w-full h-full object-cover transition duration-300 group-hover:scale-110"
+                                            alt="<%= post.title %>">
+                                    </a>
+                                </div>
+                                <div class="flex flex-col justify-between py-0.5 flex-grow min-w-0">
+                                    <div>
+                                        <h3
+                                            class="text-white font-bold text-sm md:text-lg leading-snug line-clamp-2 mb-2 group-hover:text-pink-500 transition-colors">
+                                            <a href="/read/<%= post.slug %>">
+                                                <%= post.title %>
+                                            </a>
+                                        </h3>
+                                        <p
+                                            class="hidden md:block text-gray-400 text-xs line-clamp-2 mb-2 leading-relaxed">
+                                            <%- post.content.replace(/(<([^>]+)>)/ig,"").substring(0, 100) %>...
+                                        </p>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-xs text-gray-400">
+                                        <span class="text-pink-500 font-bold uppercase">
+                                            <%= post.category[0] %>
+                                        </span>
+                                        <span>•</span>
+                                        <span>
+                                            <%= post.createdAt.toLocaleDateString('id-ID', { day: 'numeric' ,
+                                                month: 'long' , year: 'numeric' }) %>
+                                        </span>
+                                    </div>
+                                </div>
+                            </article>
+                            <% }) %>
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <button id="loadMoreBtn"
+                            class="inline-block bg-gray-800 hover:bg-gray-700 text-gray-300 px-8 py-3 rounded-full text-sm font-bold transition shadow-lg cursor-pointer border border-gray-700 hover:border-pink-500">
+                            Muat Lebih Banyak
+                        </button>
+                        <div id="loadingText"
+                            class="hidden flex justify-center items-center gap-2 text-gray-500 text-sm py-2">
+                            <svg class="animate-spin h-5 w-5 text-pink-500" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                            <span>Sedang memuat...</span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="lg:col-span-1 space-y-8">
+
+                    <div class="p-5 border border-gray-700">
+                        <h4
+                            class="text-lg font-bold text-white mb-4 flex items-center gap-2 border-b border-gray-600 pb-2">
+                            <span class="text-pink-500">#</span> Berita Anime
+                        </h4>
+                        <div class="space-y-4">
+                            <% // Filter Postingan Kategori 'Anime' (Case Insensitive) const
+                                animePosts=listPosts.filter(p=> p.category.some(c => c.toLowerCase() ===
+                                'anime')).slice(0, 5);
+                                %>
+                                <% if(animePosts.length> 0) { %>
+                                    <% animePosts.forEach(post=> { %>
+                                        <div class="flex gap-3 group">
+                                            <div class="w-16 h-16 flex-shrink-0 rounded overflow-hidden">
+                                                <img src="<%= post.image.startsWith('http') ? post.image : '/uploads/' + post.image %>"
+                                                    class="w-full h-full object-cover">
+                                            </div>
+                                            <div>
+                                                <h5
+                                                    class="text-white text-sm font-semibold line-clamp-2 leading-snug group-hover:text-pink-500 transition">
+                                                    <a href="/read/<%= post.slug %>">
+                                                        <%= post.title %>
+                                                    </a>
+                                                </h5>
+                                                <small class="text-gray-500 text-xs">
+                                                    <%= post.createdAt.toLocaleDateString('id-ID') %>
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <p class="text-gray-500 text-sm">Belum ada berita anime.</p>
+                                                <% } %>
+                        </div>
+                    </div>
+
+                    <div class="p-5 border border-gray-700">
+                        <h4
+                            class="text-lg font-bold text-white mb-4 flex items-center gap-2 border-b border-gray-600 pb-2">
+                            <span class="text-yellow-500">#</span> Jadwal Rilis
+                        </h4>
+                        <div class="space-y-4">
+                            <% const jadwalPosts=listPosts.filter(p=> p.category.some(c => c.toLowerCase() ===
+                                'jadwal')).slice(0, 5);
+                                %>
+                                <% if(jadwalPosts.length> 0) { %>
+                                    <% jadwalPosts.forEach(post=> { %>
+                                        <div class="flex gap-3 group">
+                                            <div
+                                                class="w-4 h-4 mt-0.5 rounded-full bg-yellow-500/20 text-yellow-500 flex items-center justify-center text-[10px] font-bold">
+                                                >
+                                            </div>
+                                            <h5
+                                                class="text-gray-300 text-sm font-medium line-clamp-2 hover:text-yellow-500 transition">
+                                                <a href="/read/<%= post.slug %>">
+                                                    <%= post.title %>
+                                                </a>
+                                            </h5>
+                                        </div>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <p class="text-gray-500 text-sm">Belum ada jadwal terbaru.</p>
+                                                <% } %>
+                        </div>
+                    </div>
+
+                    <div class="p-5 border border-gray-700">
+                        <h4
+                            class="text-lg font-bold text-white mb-4 flex items-center gap-2 border-b border-gray-600 pb-2">
+                            <span class="text-blue-500">#</span> Berita Manga
+                        </h4>
+                        <div class="grid grid-cols-2 gap-3">
+                            <% const mangaPosts=listPosts.filter(p=> p.category.some(c => c.toLowerCase() ===
+                                'manga')).slice(0, 4);
+                                %>
+                                <% if(mangaPosts.length> 0) { %>
+                                    <% mangaPosts.forEach(post=> { %>
+                                        <a href="/read/<%= post.slug %>" class="group block">
+                                            <div class="h-24 rounded overflow-hidden mb-2 relative">
+                                                <img src="<%= post.image.startsWith('http') ? post.image : '/uploads/' + post.image %>"
+                                                    class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                                                <span
+                                                    class="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-1 rounded">Manga</span>
+                                            </div>
+                                            <h5
+                                                class="text-gray-300 text-xs font-semibold line-clamp-2 group-hover:text-blue-400 transition">
+                                                <%= post.title %>
+                                            </h5>
+                                        </a>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <p class="text-gray-500 text-sm col-span-2">Belum ada update manga.</p>
+                                                <% } %>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <% } else { %>
+                <div class="py-20 text-center border border-gray-800 rounded-xl mt-10">
+                    <h3 class="text-xl font-bold text-gray-400">Belum ada berita</h3>
+                    <p class="text-gray-600 mt-2">Silakan posting berita pertama Anda.</p>
+                </div>
+                <% } %>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let currentSkip = 13;
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            const loadingText = document.getElementById('loadingText');
+            const container = document.getElementById('post-container');
+
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', function () {
+                    loadMoreBtn.classList.add('hidden');
+                    loadingText.classList.remove('hidden');
+
+                    fetch(`/api/load-more?skip=${currentSkip}`)
+                        .then(res => res.json())
+                        .then(posts => {
+                            if (posts.length > 0) {
+                                posts.forEach(post => {
+                                    let imgUrl = post.image.startsWith('http') ? post.image : '/uploads/' + post.image;
+                                    const dateStr = new Date(post.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                                    const category = post.category && post.category.length > 0 ? post.category[0] : 'News';
+                                    const excerpt = post.content.replace(/(<([^>]+)>)/ig, "").substring(0, 110) + "...";
+
+                                    const html = `
+                                <article class="flex gap-4 border-b border-gray-800 pb-6 last:border-0 group animate-slideDown">
+                                    <div class="w-[120px] h-[85px] md:w-[180px] md:h-[120px] flex-shrink-0 overflow-hidden rounded-md bg-gray-800">
+                                        <a href="/read/${post.slug}" class="block w-full h-full">
+                                            <img src="${imgUrl}" class="w-full h-full object-cover transition duration-300 group-hover:scale-110" alt="${post.title}">
+                                        </a>
+                                    </div>
+                                    <div class="flex flex-col justify-between py-0.5 flex-grow min-w-0">
+                                        <div>
+                                            <h3 class="text-white font-bold text-sm md:text-lg leading-snug line-clamp-2 mb-2 group-hover:text-pink-500 transition-colors">
+                                                <a href="/read/${post.slug}">${post.title}</a>
+                                            </h3>
+                                            <p class="hidden md:block text-gray-400 text-sm line-clamp-2 mb-2 leading-relaxed">
+                                                ${excerpt}
+                                            </p>
+                                        </div>
+                                        <div class="flex items-center gap-3 text-xs text-gray-400">
+                                            <span class="text-pink-500 font-bold uppercase">${category}</span>
+                                            <span>•</span>
+                                            <span>${dateStr}</span>
+                                        </div>
+                                    </div>
+                                </article>`;
+                                    container.insertAdjacentHTML('beforeend', html);
+                                });
+                                currentSkip += posts.length;
+                                loadMoreBtn.classList.remove('hidden');
+                                loadingText.classList.add('hidden');
+                            } else {
+                                loadMoreBtn.classList.add('hidden');
+                                loadingText.innerHTML = "<span class='text-gray-600'>Semua berita sudah ditampilkan.</span>";
+                                loadingText.classList.remove('hidden');
+                            }
+                        })
+                        .catch(console.error);
+                });
+            }
+        });
+    </script>
+
+    <%- include('partials/footer') %>

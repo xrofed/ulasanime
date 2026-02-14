@@ -1,0 +1,116 @@
+<%- include('../partials/header') %>
+
+<link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+<style>
+    .tagify { --tags-border-color: #374151; --tags-focus-border-color: #db2777; --tag-bg: #1f2937; --tag-text-color: #fff; background-color: #1f2937; color: white; border-radius: 0.5rem; }
+    .tagify__input { color: white; }
+    .tagify__dropdown { background: #1f2937; color: white; border-color: #374151; }
+    .tagify__dropdown__item:hover { background: #374151; color: #db2777; }
+</style>
+
+<script src="https://cdn.tiny.cloud/1/aem9p7at0sj3ygzyl8vzre280voqzloawtw2jrhlxoelerkf/tinymce/8/tinymce.min.js" referrerpolicy="origin" crossorigin="anonymous"></script>
+
+<div class="container mx-auto px-4 py-8 mb-10">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-gray-800 rounded-xl shadow-xl border border-gray-700 overflow-hidden">
+            <div class="bg-gray-900 px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+                <h5 class="text-xl font-bold text-white">Tulis Berita Baru</h5>
+            </div>
+            
+            <div class="p-6">
+                <form action="/admin/post" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="md:col-span-3">
+                            <label class="block text-gray-400 font-bold mb-2">Judul Berita</label>
+                            <input type="text" name="title" id="titleInput" class="w-full bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-pink-500 transition" required placeholder="Judul artikel...">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-gray-400 font-bold mb-2">Status</label>
+                            <select name="status" class="w-full bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-pink-500 transition">
+                                <option value="published">✅ Publish</option>
+                                <option value="draft">📝 Draft</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2">Custom URL (Slug)</label>
+                        <div class="flex">
+                            <span class="inline-flex items-center px-3 text-sm text-gray-400 bg-gray-900 border border-r-0 border-gray-600 rounded-l-md">
+                                /read/
+                            </span>
+                            <input type="text" name="slug" id="slugInput" class="w-full bg-gray-700 text-white border border-gray-600 rounded-r-lg px-4 py-3 focus:outline-none focus:border-pink-500 transition" placeholder="judul-berita-anda-disini">
+                        </div>
+                        <small class="text-gray-500">Biarkan kosong jika ingin slug dibuat otomatis dari judul.</small>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2">
+                            Meta Description (SEO) 
+                            <span class="text-xs font-normal text-gray-500 ml-2">(Opsional, max 160 karakter disarankan)</span>
+                        </label>
+                        <textarea name="seoDescription" rows="2" class="w-full bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-pink-500 transition text-sm" placeholder="Tulis ringkasan menarik untuk hasil pencarian Google..."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-400 font-bold mb-2">Kategori</label>
+                            <input name="category" class="w-full bg-gray-700 text-white rounded-lg" value="Anime">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 font-bold mb-2">Tags</label>
+                            <input name="tags" class="w-full bg-gray-700 text-white rounded-lg">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2">Gambar Utama</label>
+                        <input type="file" name="image" class="w-full bg-gray-700 text-gray-300 border border-gray-600 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-l-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-600 file:text-white hover:file:bg-gray-500 cursor-pointer" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2">Isi Berita</label>
+                        <textarea id="editor-content" name="content" class="w-full"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg shadow-lg transition transform hover:-translate-y-1">
+                        Simpan Postingan
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+<script>
+  tinymce.init({
+    selector: '#editor-content',
+    skin: 'oxide-dark', content_css: 'dark',
+    plugins: ['code', 'link', 'image', 'lists', 'media', 'table', 'wordcount'],
+    toolbar: 'code | undo redo | bold italic | link media | numlist bullist',
+    height: 500
+  });
+
+  // Tagify
+  new Tagify(document.querySelector('input[name=category]'), { whitelist: ["Anime", "Manga", "Game", "Jadwal"], dropdown: { maxItems: 20, enabled: 0, closeOnSelect: false } });
+  new Tagify(document.querySelector('input[name=tags]'));
+
+  // Auto-Generate Slug
+  const titleInput = document.getElementById('titleInput');
+  const slugInput = document.getElementById('slugInput');
+  
+  titleInput.addEventListener('keyup', function() {
+      if (slugInput.value === '' || slugInput.dataset.manual !== 'true') {
+          let slug = titleInput.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+          slugInput.value = slug;
+      }
+  });
+
+  slugInput.addEventListener('keyup', function() {
+      slugInput.dataset.manual = 'true'; 
+  });
+</script>
+
+<%- include('../partials/footer') %>
